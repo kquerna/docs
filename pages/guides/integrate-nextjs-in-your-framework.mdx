@@ -1,0 +1,179 @@
+import Guide from '~/components/layout/guide'
+
+import Snippet from '~/components/snippet'
+
+export const meta = {
+  title: 'Integrate Next.js in your Framework',
+  description: 'Use Gasket to integrate Next.js into your team's frameworks.',
+  published: '16 April 2020',
+  authors: ['kinetifex'],
+  url: '/guides/integrate-nextjs-in-your-framework'
+}
+# Integrate Next.js in your Framework
+
+[GoDaddy] has been using React for our webapp's for several years now. However,
+how we built our React apps was quite a bit different from team to team. We
+decided to look for processes and patterns that would allow us to build our web
+apps more efficiently and fully-featured out of the box. That's when we
+discovered Next.js.
+
+Next.js has been fantastic. It does a great job integrating React with routing,
+server-side rendering and removes the burden of configuring Webpack. However,
+out of the box, it didn't quite provide the full picture of what we needed in a
+framework for webapps at GoDaddy.
+
+In addition to React, we use Redux for state management, React Intl for
+internationalization, and we also tend to use Express for common middleware and
+routes. Now, I know you may be thinking _Hey you can use that stuff with
+Next.js_, and you would be correct. There are several examples with modules and
+recipes for setting this stuff up in your app. You can start up a new Next.js
+with an example using `create-next-app`. However, there is no way to compose an
+app from multiple examples or to even make these things integrate together. To
+rapidly spin up new webapps, these desired features need to all be in place at
+the start.
+
+## Make your Framework
+
+To address this need, GoDaddy developed a framework maker we call [Gasket].
+Gasket lets you compose a framework for building Node.js apps by choosing and
+authoring your own plugins. Plugins can be combined into presets, helping your
+team rapidly and consistently create new apps from with a standard set of
+features. We have since open-sourced Gasket with several plugins available. One
+of these plugins is for, you guessed it, Next.js.
+
+Additionally, there is a Next.js preset you can start with or extend for
+building out your own Next.js apps. In this preset, you will find that plugins
+for Redux and Express are included. This means when you spin up a new app with
+this preset, you will have batteries included Next.js app with Redux and Express
+wired up at the start! Let us take a look.
+
+Getting started with Gasket is easy. Install the CLI and run the **create**
+command to get an app going.
+
+```bash
+npm i -g @gasket/cli
+gasket create my-app --presets @gasket/preset-nextjs
+```
+
+Once your app is created, change directory and fire it up with the **local**
+command for development.
+
+```bash
+cd ./my-app
+gasket local
+```
+
+Your development cycle with Gasket is no different than what you are used to
+with the Next.js CLI. For example, when you're ready to **build** and **start**,
+use the corresponding Gasket commands.
+
+```
+gasket build
+gasket start
+```
+
+## Lifecycles
+
+Now, Gasket is more than just an app generator. Once you get started with it,
+you'll want to use it to manage your app with the commands we just mentioned.
+Why? Because while Gasket can be used to stand up scaffolding, it's real power
+comes into play when making use of lifecycles available during builds and
+runtime.
+
+For an overview of what's possible, let's turn our Gasket-powered Next.js app
+into a Progressive Web App by adding the Gasket PWA preset. As mentioned,
+presets are a collection of plugins, and multiple presets can be used in an app.
+You could (and to save time, should) specify presets during the create command.
+However, to demonstrate some of the power behind plugins beyond scaffolding, let
+us set up the Gasket PWA preset in our existing Next.js app.
+
+First, install the preset module in your app.
+
+```bash
+npm i @gasket/preset-pwa
+```
+
+Second, configure your Gasket app to include the preset.
+
+```diff
+// gasket.config.js
+module.exports = {
+  plugins: {
+    presets: [
+      '@gasket/preset-nextjs'
+      + '@gasket/preset-pwa'
+    ]
+  ]
+}
+```
+
+Now you're ready to go! The PWA preset brings in the Gasket plugins for service
+workers and Workbox to configure caching. Let us look at some of the
+integrations these plugins provide.
+
+During the **build** command the Workbox plugin will hook the build lifecycle to
+set up the Workbox libraries. That's about all that goes on during build with
+these plugins. Things really get interesting during runtime.
+
+With the **start** command, the service worker plugin sets up an Express route,
+so when requests come in for `sw.js` script, it can execute a new Gasket
+lifecycle to compose the service worker dynamically. The Workbox plugin, hooks
+that compose lifecycle and asks other plugins what config they want to add to
+the Workbox config by way of a workbox lifecycle. Now, our Next.js plugin hooks
+this workbox lifecycle, and lets it know about the `.next/static/*` files so
+they can be included for precaching!
+
+> You may be wondering why the service worker script is not just generated
+> during the build command. With dynamic support, you can shape the script based
+> on the request, such as precaching different language files based on the
+> accept-language header.
+
+As you can see, there is a lot of power with plugins with lifecycles. We can
+avoid boilerplate code and get the features we want for our apps integrated by
+simply having Gasket plugins configured in our app. If we wanted to create
+another Next.js app, with PWA support, it is as easy as:
+
+```bash
+gasket create my-app --presets @gasket/preset-nextjs,@gasket/preset-pwa
+```
+
+Now we have a fully-featured framework for creating Next.js progressive webapps
+with only some Gasket presets!
+
+## Plugins over Examples
+
+_This is cool! But I don't use Redux or Express in my Next.js app._ That's OK,
+you don't have to, it is just how we got started. The beauty of the Gasket
+plugin and lifecycle system is that you are not locked into a single way of
+doing things. Rather you can create your own integrations that work with others.
+Once the plugins you want are in place, stamp them into a preset and BOOM you
+have made yourself a new framework!
+
+If you are a library developer, instead of, or in addition to, adding yet
+another Next.js example, consider contributing a Gasket plugin. If you are an
+app developer, look to using Gasket plugins to tie in the features you want for
+your Next.js apps, and consider contributing plugins for those that are missing.
+If your team develops several webapps, and wants to have a framework for doing
+so, build out a Gasket preset with the plugins you need for consistent
+workflows.
+
+Head on over to [gasket.dev][Gasket] to see more on how to get started and
+explore the existing plugins. And the next time you are spinning up a Next.js
+app, power it with Gasket to incorporate all the features you want from the
+start!
+
+## Links
+
+- [Gasket]
+- [Next.js]
+- [GoDaddy]
+- [Workbox]
+
+<!--- LINKS -->
+
+[Gasket]:https://gasket.dev
+[Next.js]:https://nextjs.org
+[GoDaddy]:https://godaddy.com
+[Workbox]:https://developers.google.com/web/tools/workbox
+
+export default ({ children }) => <Guide meta={meta}>{children}</Guide>
