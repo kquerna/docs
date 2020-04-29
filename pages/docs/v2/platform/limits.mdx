@@ -3,12 +3,13 @@ import Limits from '~/components/limits'
 import Note from '~/components/text/note'
 import ProductName from '~/components/name/product-name'
 import { PRODUCT_NAME } from '~/lib/constants'
+import EmailLink from '~/components/text/email-link'
 
 export const meta = {
   title: 'Limits',
   description: `A list of limits and limitations that apply on the ${PRODUCT_NAME} platform.`,
   editUrl: 'pages/docs/v2/platform/limits.mdx',
-  lastEdited: '2020-04-14T00:02:08.000Z'
+  lastEdited: '2020-04-26T22:18:16.000Z'
 }
 
 This page outlines all relevant limits and limitations present when using the <ProductName /> platform.
@@ -25,11 +26,12 @@ To prevent abuse of our platform, we apply the following limits to all accounts.
 | Serverless Functions per Deployment    | 12    | 24   | Custom     |
 | Serverless Functions per Month         | 160   | 640  | Custom     |
 | Serverless Function Duration (Seconds) | 10    | 60   | 900        |
-| Deployments created from CLI per week  | 25    | 25   | Custom     |
+| Deployments created from CLI per week  | 2000  | 2000 | Custom     |
+| Team members per Team                  | -     | 10   | Custom     |
 
 <Note>
   Next.js Static Site Generation and Next.js Preview Serverless Functions are
-  excluded from the count for "Maximum Functions per Deployment".
+  excluded from the count for "Serverless Functions per Deployment".
 </Note>
 
 ## Logs
@@ -38,7 +40,7 @@ All log types - **Build Time**, **Edge Network**, and **Runtime** - have differi
 
 During the [Build Step](/docs/v2/platform/glossary#build-step), all logs are stored and **persisted**.
 
-For [Edge Network requests](/docs/v2/network/regions-and-providers#automatic-edge-cdn), all logs are **not persisted**.
+For [Edge Network requests](/docs/v2/edge-network/regions#automatic-edge-cdn), all logs are **not persisted**.
 
 For [Serverless Functions](/docs/v2/serverless-functions/introduction/), only logs from failed requests are **persisted**.
 
@@ -52,7 +54,7 @@ The total size of [Environment Variables](/docs/v2/build-step#environment-variab
 
 ## Domains
 
-The maximum amount of domains that can be applied to a single project is **50**. If your Project requires more than 50 domains, please [contact our enterprise team](mailto:enterprise@zeit.co).
+The maximum amount of domains that can be applied to a single project is **50**. If your Project requires more than 50 domains, please <EmailLink type="sales">contact our enterprise team</EmailLink>.
 
 ## Files
 
@@ -68,7 +70,7 @@ The <ProductName /> platform does not currently support HTTP/2 Push.
 
 [Serverless Functions](/docs/v2/serverless-functions/introduction) do not support WebSockets.
 
-Instead of pushing data, you can intelligently fetch data on-demand. For example, the `zeit.co` dashboard delivers real-time updates using [SWR](https://swr.now.sh).
+Instead of pushing data, you can intelligently fetch data on-demand. For example, the <ProductName /> dashboard delivers real-time updates using [SWR](https://swr.now.sh).
 
 If you need persistent connections to push data to the client, consider using third party pub/sub services. See the [Pusher Channels Guide](/guides/deploying-pusher-channels-with-zeit-now) for an example.
 
@@ -94,7 +96,7 @@ You can use the [functions](/docs/configuration#project/functions) property to a
 
 The maximum number of concurrent executions for a [Serverless Function](/docs/v2/serverless-functions/introduction/) is `1000`.
 
-If you require a limit above `1000`, you should [contact our enterprise department](mailto:sales@zeit.co) to discuss custom limits available on an enterprise plan.
+If you require a limit above `1000`, you should <EmailLink type="sales">contact our enterprise team</EmailLink> to discuss custom limits available on an enterprise plan.
 
 ## Serverless Function Payload Size Limit
 
@@ -116,6 +118,7 @@ When attempting to deploy Serverless Functions to multiple regions on the Hobby 
 
 The following environment variable names are [reserved](https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html#lambda-environment-variables) and therefore unavailable for use:
 
+- Names starting with `VERCEL_`
 - Names starting with `NOW_`
 - `AWS_REGION`
 - `AWS_DEFAULT_REGION`
